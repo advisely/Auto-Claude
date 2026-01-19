@@ -1,4 +1,4 @@
-## Unreleased - WSL2/WSLg Compatibility
+# Unreleased - WSL2/WSLg Compatibility
 
 ### ✨ New Platform Support
 

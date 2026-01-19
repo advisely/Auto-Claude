@@ -253,6 +253,14 @@ function createWindow(): void {
   });
 }
 
+// Fix Windows GPU cache permission errors (0x5 Access Denied)
+// Must be done before app.whenReady() and outside try-catch
+if (is.windows) {
+  app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
+  app.commandLine.appendSwitch('disable-gpu-program-cache');
+  console.log('[main] Applied Windows GPU cache fixes');
+}
+
 // Set app name before ready (for dock tooltip on macOS in dev mode)
 // WSL2 compatibility: wrap in try-catch since app may not be initialized yet
 try {
@@ -260,13 +268,6 @@ try {
   if (is.mac) {
     // Force the name to appear in dock on macOS
     app.name = 'Auto Claude';
-  }
-
-  // Fix Windows GPU cache permission errors (0x5 Access Denied)
-  if (is.windows) {
-    app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
-    app.commandLine.appendSwitch('disable-gpu-program-cache');
-    console.log('[main] Applied Windows GPU cache fixes');
   }
 } catch (e) {
   // App not ready yet (WSL2), will be set in whenReady handler
