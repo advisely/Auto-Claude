@@ -1,12 +1,12 @@
 # Unreleased - WSL2/WSLg Compatibility
 
-### ✨ New Platform Support
+## ✨ New Platform Support
 
 - **Full WSL2/WSLg compatibility** - Auto Claude Electron desktop app now runs natively on Windows 11 WSL2 with WSLg (Windows Subsystem for Linux Graphics)
 
 - Added comprehensive WSL2 setup guide and troubleshooting documentation ([guides/WSL2_SETUP.md](guides/WSL2_SETUP.md))
 
-### 🛠️ Technical Improvements
+## 🛠️ Technical Improvements
 
 **Lazy Initialization Pattern:**
 - Implemented lazy initialization for all Electron app access to handle delayed initialization on WSL2
@@ -39,7 +39,7 @@
 - Added safe `app.getAppPath()` access with try-catch for WSL2 compatibility
 - Multiple fallback paths for backend detection
 
-### 🐛 Bug Fixes
+## 🐛 Bug Fixes
 
 - Fixed "app.getVersion() is not a function" errors on WSL2 startup
 - Fixed "autoUpdater is not defined" errors when accessing update functions
@@ -50,7 +50,7 @@
 - Fixed module-level constant initialization issues on WSL2
 - Fixed singleton service initialization timing on WSL2
 
-### 📚 Documentation
+## 📚 Documentation
 
 - Added [WSL2_SETUP.md](guides/WSL2_SETUP.md) with:
   - Prerequisites and installation steps
@@ -60,7 +60,7 @@
   - Architecture patterns for WSL2 compatibility
   - Testing checklist for WSL2 development
 
-### 🔧 Files Changed
+## 🔧 Files Changed
 
 **Main Process:**
 - `apps/frontend/src/main/index.ts` - Lazy platform detection, safe app initialization

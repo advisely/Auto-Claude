@@ -113,22 +113,25 @@ The following sections document the technical challenges encountered when runnin
 **[apps/frontend/src/main/index.ts](../apps/frontend/src/main/index.ts)**
 
 ```typescript
-// Lazy-loaded platform info to avoid @electron-toolkit/utils initialization issues
+// Import centralized platform abstraction functions
+import { isDev, isMacOS, isWindows, isLinux } from './platform';
+
+// Lazy-loaded platform info using centralized abstraction
 const is = {
-  get dev() { return !app.isPackaged; },
-  get mac() { return process.platform === 'darwin'; },
-  get windows() { return process.platform === 'win32'; },
-  get linux() { return process.platform === 'linux'; }
+  get dev() { return isDev(); },
+  get mac() { return isMacOS(); },
+  get windows() { return isWindows(); },
+  get linux() { return isLinux(); }
 };
 
 // Wrap app.setName in try-catch
 try {
   app.setName('Auto Claude');
-  if (process.platform === 'darwin') {
+  if (isMacOS()) {
     app.name = 'Auto Claude';
   }
 
-  if (process.platform === 'win32') {
+  if (isWindows()) {
     app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
     app.commandLine.appendSwitch('disable-gpu-program-cache');
   }

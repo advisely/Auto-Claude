@@ -313,25 +313,23 @@ app.whenReady().then(() => {
     }
   }
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
+  // Handle keyboard shortcuts: F12 for DevTools in development,
+  // and prevent Ctrl/Cmd+R refresh in production.
   app.on('browser-window-created', (_, window) => {
-    // F12 toggles DevTools in development
-    if (is.dev) {
-      window.webContents.on('before-input-event', (_, input) => {
-        if (input.type === 'keyDown' && input.key === 'F12') {
-          window.webContents.toggleDevTools();
-        }
-      });
-    }
-    // Disable Ctrl/Cmd+R refresh in production
-    if (!is.dev) {
-      window.webContents.on('before-input-event', (event, input) => {
-        if (input.type === 'keyDown' && input.key === 'r' && (input.control || input.meta)) {
-          event.preventDefault();
-        }
-      });
-    }
+    window.webContents.on('before-input-event', (event, input) => {
+      if (input.type !== 'keyDown') return;
+
+      // F12 toggles DevTools in development
+      if (is.dev && input.key === 'F12') {
+        window.webContents.toggleDevTools();
+        return;
+      }
+
+      // Disable Ctrl/Cmd+R refresh in production
+      if (!is.dev && input.key === 'r' && (input.control || input.meta)) {
+        event.preventDefault();
+      }
+    });
   });
 
   // Initialize agent manager
