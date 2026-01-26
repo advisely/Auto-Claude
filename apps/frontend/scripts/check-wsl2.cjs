@@ -17,22 +17,21 @@ const fs = require('fs');
  * Check if running in WSL2 environment
  *
  * Detection methods (in order of reliability):
- * 1. WSL_DISTRO_NAME environment variable - set by WSL2 automatically
- * 2. /proc/version contains 'microsoft' - WSL2 kernel signature
+ * 1. /proc/version contains both 'microsoft' AND 'wsl2' - WSL2 kernel signature
+ *    - WSL1: "Linux version 4.4.0-19041-Microsoft" (no "wsl2")
+ *    - WSL2: "Linux version 5.15.90.1-microsoft-standard-WSL2" (has "wsl2")
+ * 2. WSL_DISTRO_NAME alone is not sufficient as it's set in both WSL1 and WSL2
  *
  * @returns {boolean} true if in WSL2, false otherwise
  */
 function isWSL2() {
-  // Check WSL_DISTRO_NAME environment variable (most reliable)
-  if (process.env.WSL_DISTRO_NAME) {
-    return true;
-  }
-
-  // Check /proc/version for WSL2 kernel signature (Linux only)
+  // Check /proc/version for WSL2-specific kernel signature (Linux only)
+  // WSL2 kernels contain "microsoft" AND "wsl2" markers
   if (process.platform === 'linux') {
     try {
       const versionInfo = fs.readFileSync('/proc/version', 'utf8').toLowerCase();
-      return versionInfo.includes('microsoft');
+      // Require both markers to distinguish WSL2 from WSL1
+      return versionInfo.includes('microsoft') && versionInfo.includes('wsl2');
     } catch {
       return false;
     }

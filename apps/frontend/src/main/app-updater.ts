@@ -44,7 +44,7 @@ let periodicCheckIntervalId: ReturnType<typeof setInterval> | null = null;
  *
  * @param channel - The update channel to use
  */
-export function setUpdateChannel(channel: UpdateChannel, updater?: any): void {
+export function setUpdateChannel(channel: UpdateChannel, updater?: AppUpdater): void {
   const autoUpdater = updater || require('electron-updater').autoUpdater;
   autoUpdater.channel = channel;
   // Clear any downloaded update info when channel changes to prevent showing
@@ -106,7 +106,7 @@ export function initializeAppUpdater(window: BrowserWindow, betaUpdates = false)
   console.warn('[app-updater] ========================================');
   console.warn('[app-updater] Initializing app auto-updater');
   console.warn('[app-updater] App packaged:', app.isPackaged);
-  console.warn('[app-updater] Current version:', autoUpdater.currentVersion.version);
+  console.warn('[app-updater] Current version:', app.getVersion());
   console.warn('[app-updater] Update channel:', channel);
   console.warn('[app-updater] Auto-download enabled:', autoUpdater.autoDownload);
   console.warn('[app-updater] Debug mode:', DEBUG_UPDATER);
@@ -245,7 +245,7 @@ export async function checkForUpdates(): Promise<AppUpdateInfo | null> {
       return null;
     }
 
-    const currentVersion = autoUpdater.currentVersion.version;
+    const currentVersion = app.getVersion();
     const latestVersion = result.updateInfo.version;
 
     // Use proper semver comparison to detect if update is actually newer

@@ -852,12 +852,40 @@ export class ProjectStore {
 // Lazy-initialized singleton instance (WSL2 compatible)
 let _projectStore: ProjectStore | null = null;
 
+/**
+ * Get the lazy-initialized ProjectStore instance
+ */
+function getProjectStoreInstance(): ProjectStore {
+  if (!_projectStore) {
+    _projectStore = new ProjectStore();
+  }
+  return _projectStore;
+}
+
 export const projectStore = new Proxy({} as ProjectStore, {
-  get(target, prop) {
-    if (!_projectStore) {
-      _projectStore = new ProjectStore();
-    }
-    const value = _projectStore[prop as keyof ProjectStore];
-    return typeof value === 'function' ? value.bind(_projectStore) : value;
+  get(_target, prop, receiver) {
+    const instance = getProjectStoreInstance();
+    const value = Reflect.get(instance, prop, receiver);
+    return typeof value === 'function' ? value.bind(instance) : value;
+  },
+  set(_target, prop, value, receiver) {
+    const instance = getProjectStoreInstance();
+    return Reflect.set(instance, prop, value, receiver);
+  },
+  has(_target, prop) {
+    const instance = getProjectStoreInstance();
+    return Reflect.has(instance, prop);
+  },
+  ownKeys() {
+    const instance = getProjectStoreInstance();
+    return Reflect.ownKeys(instance);
+  },
+  getOwnPropertyDescriptor(_target, prop) {
+    const instance = getProjectStoreInstance();
+    return Reflect.getOwnPropertyDescriptor(instance, prop);
+  },
+  getPrototypeOf() {
+    const instance = getProjectStoreInstance();
+    return Reflect.getPrototypeOf(instance);
   }
 });

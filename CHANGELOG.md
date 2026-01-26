@@ -31,8 +31,8 @@
 - Fixed settings path resolution by using `getSettingsPath()` function calls instead of module-level constants
 
 **Build Configuration:**
-- Ensured CJS format with `.js` extensions for main and preload bundles
-- Fixed preload script path from `.mjs` to `.js` to match build output
+- Ensured CJS format with `.cjs` extensions for main and preload bundles
+- Fixed preload script path from `.mjs` to `.cjs` to match build output
 - Externalized Sentry packages to avoid bundling issues
 
 **Backend Path Detection:**

@@ -22,6 +22,7 @@ export default defineConfig({
     define: sentryDefines,
     plugins: [externalizeDepsPlugin({
       // Bundle these packages into the main process (they won't be in node_modules in packaged app)
+      // Note: Packages in rollupOptions.external should NOT be listed here
       exclude: [
         'uuid',
         'chokidar',
@@ -33,11 +34,7 @@ export default defineConfig({
         '@anthropic-ai/sdk',
         'kuzu',
         'electron-updater',
-        '@electron-toolkit/utils',
-        // Sentry and its transitive dependencies (opentelemetry -> debug -> ms)
-        '@sentry/electron',
-        '@sentry/core',
-        '@sentry/node',
+        // Sentry transitive dependencies (opentelemetry -> debug -> ms)
         '@sentry/utils',
         '@opentelemetry/instrumentation',
         'debug',
@@ -53,7 +50,7 @@ export default defineConfig({
         },
         output: {
           format: 'cjs',
-          entryFileNames: '[name].js'
+          entryFileNames: '[name].cjs'
         },
         // External modules that should not be bundled
         external: [
@@ -75,7 +72,7 @@ export default defineConfig({
         },
         output: {
           format: 'cjs',
-          entryFileNames: '[name].js'
+          entryFileNames: '[name].cjs'
         }
       }
     }

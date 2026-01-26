@@ -75,30 +75,30 @@ export function isDev(): boolean {
     return !app.isPackaged;
   } catch {
     // If app is not ready, check NODE_ENV
-    return process.env.NODE_ENV !== 'production';
+    // Use strict equality to prevent dev mode when NODE_ENV is undefined
+    return process.env.NODE_ENV === 'development';
   }
 }
 
 /**
  * Check if running in WSL2 environment
  *
- * Detects Windows Subsystem for Linux 2 by checking:
- * 1. WSL_DISTRO_NAME environment variable (most reliable, set by WSL2 automatically)
- * 2. /proc/version for 'microsoft' signature (WSL2 kernel identifier)
+ * Detects Windows Subsystem for Linux 2 by checking /proc/version for
+ * WSL2-specific kernel markers. WSL1 and WSL2 have different signatures:
+ * - WSL1: "Linux version 4.4.0-19041-Microsoft" (no "wsl2")
+ * - WSL2: "Linux version 5.15.90.1-microsoft-standard-WSL2" (has "wsl2")
+ *
+ * Note: WSL_DISTRO_NAME alone is not sufficient as it's set in both WSL1 and WSL2
  */
 export function isWSL2(): boolean {
-  // Check WSL_DISTRO_NAME environment variable (most reliable)
-  if (process.env.WSL_DISTRO_NAME) {
-    return true;
-  }
-
-  // Check /proc/version for WSL2 kernel signature (Linux only)
+  // Check /proc/version for WSL2-specific kernel signature (Linux only)
   if (isLinux()) {
     try {
       const versionInfo = existsSync('/proc/version')
         ? readFileSync('/proc/version', 'utf8').toLowerCase()
         : '';
-      return versionInfo.includes('microsoft');
+      // Require both "microsoft" AND "wsl2" to distinguish WSL2 from WSL1
+      return versionInfo.includes('microsoft') && versionInfo.includes('wsl2');
     } catch {
       return false;
     }
