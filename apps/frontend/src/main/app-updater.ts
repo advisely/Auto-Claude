@@ -43,10 +43,24 @@ let periodicCheckIntervalId: ReturnType<typeof setInterval> | null = null;
  * - 'beta': Receive pre-release/beta versions
  *
  * @param channel - The update channel to use
+ * @param updater - Optional updater instance (uses module-level autoUpdater if not provided)
  */
 export function setUpdateChannel(channel: UpdateChannel, updater?: AppUpdater): void {
-  const autoUpdater = updater || require('electron-updater').autoUpdater;
-  autoUpdater.channel = channel;
+  // Use provided updater, or module-level autoUpdater, or lazily initialize
+  let targetUpdater = updater || autoUpdater;
+  if (!targetUpdater) {
+    // Lazy-load if module-level autoUpdater hasn't been initialized yet
+    const updaterModule = require('electron-updater');
+    autoUpdater = updaterModule.autoUpdater;
+    targetUpdater = autoUpdater;
+  }
+
+  if (!targetUpdater) {
+    console.warn('[app-updater] Cannot set channel: autoUpdater not available');
+    return;
+  }
+
+  targetUpdater.channel = channel;
   // Clear any downloaded update info when channel changes to prevent showing
   // an Install button for an update from a different channel
   downloadedUpdateInfo = null;
