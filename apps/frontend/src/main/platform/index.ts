@@ -18,7 +18,7 @@ import { spawn, ChildProcess } from 'child_process';
 import { OS, ShellType, PathConfig, ShellConfig, BinaryDirectories } from './types';
 
 // Re-export from paths.ts for backward compatibility
-export { getWindowsShellPaths } from './paths';
+export { getWindowsShellPaths, getOllamaExecutablePaths, getOllamaInstallCommand, getWhichCommand } from './paths';
 
 /**
  * Get the current operating system
@@ -330,8 +330,8 @@ export function getNpxCommand(): string {
  * or environment variable expansion.
  */
 export function isSecurePath(candidatePath: string): boolean {
-  // Reject empty strings to maintain cross-platform consistency
-  if (!candidatePath) return false;
+  // Reject empty or whitespace-only strings to maintain cross-platform consistency with backend
+  if (!candidatePath || !candidatePath.trim()) return false;
 
   // Security validation: reject paths with dangerous patterns
   const dangerousPatterns = [
@@ -339,7 +339,7 @@ export function isSecurePath(candidatePath: string): boolean {
     /%[^%]+%/,                   // Windows environment variable expansion
     /\.\.\//,                    // Unix directory traversal
     /\.\.\\/,                    // Windows directory traversal
-    /[\r\n]/                     // Newlines (command injection)
+    /[\r\n\x00]/                 // Newlines (command injection), null bytes (path truncation)
   ];
 
   for (const pattern of dangerousPatterns) {
